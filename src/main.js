@@ -3,8 +3,7 @@ import App from './App.svelte';
 const app = new App({
 	target: document.body,
 	props: {
-		name: 'world',
-		slides: ["1", "2"]
+		slides: ["1", "2", "3", "4"]
 	}
 });
 
