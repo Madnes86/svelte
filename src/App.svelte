@@ -1,78 +1,43 @@
 <script>
-import { onMount } from 'svelte';
-export let slides;
+import Slide 	   from './Slide.svelte'
+import SlideButton from './SlideButton.svelte'
+import Dot   	   from './Dot.svelte'
 
-let blocks;
-let dots;
-let currentIndex = 0;
+	let slides = ["1", "2", "3", "4"]; // Массив наших слайдов 
+	let active = 1; 			  // Указывает какой номер слайда будет отображаться первым
+	let blocks = []; 			  // Ссылка на DOM элемент массива slides
+    let contentDiv;  			  // Ссыдка на DOM элемент слайдера
+	const SLIDE_INDENTATION = 100 // Наша константа отступа px от слайда
 
-onMount(() => {
-    blocks = document.querySelectorAll(".slide"); // Картинки (слайды)
-    dots = document.querySelectorAll(".dot");     // Кнопки навигации
-    const content = document.querySelector(".flex.justify-between"); // main slide
-    const contentWidth = content.offsetWidth;
+    $: if(slides.length && contentDiv) {
+        const slideWidth = blocks[0].offsetWidth; // возможно стоит переименовать blocks в slideLink или slideDOM
+        const contentWidth = contentDiv.offsetWidth;
+        const centerX = (contentWidth / 2) - (slideWidth / 2);
 
-    // Находим начальный активный элемент
-    function start() {
-        const blockWidth = blocks[0].offsetWidth; // Предполагаем одинаковую ширину
-        let centerX = (contentWidth / 2) - (blockWidth / 2);
-
-        // Сначала найдем активный слайд
         for (let i = 0; i < blocks.length; i++) {
-            if (blocks[i].classList.contains('active')) {
-                currentIndex = i;
-                dots[currentIndex].style.backgroundColor = "#333";
-                break;
-            }
-        }
-
-        // Позеционируем слайды относительно активного
-        for (let i = 0; i < blocks.length; i++) {
-            const offsetFromActive = (i - currentIndex) * 100;
+            const offsetFromActive = (i - active) * SLIDE_INDENTATION;
             const x = centerX + offsetFromActive;
             blocks[i].style.transform = `translate(${x}px, 0px)`;
-            if (i !== currentIndex) {
-                dots[i].style.backgroundColor = "#ccc";
-            }
         }
     }
-
-    function updateActive(newIndex) {
-        blocks[currentIndex].classList.remove('active');
-        blocks[newIndex].classList.add('active');
-        currentIndex = newIndex;
+	function increment() {
+		const newActive = (active + 1) % blocks.length;
+        updateActive(newActive);
+	}
+	function decrement() {
+		const newActive = (active - 1 + blocks.length) % blocks.length;
+        updateActive(newActive);
+	}
+	function updateActive(newActive) {
+		active = newActive;
     }
-
-    const increment = document.getElementById("increment");
-    increment.addEventListener('click', () => {
-        const newIndex = (currentIndex + 1) % blocks.length;
-        updateActive(newIndex);
-        start();
-    });
-
-    const decrement = document.getElementById("decrement");
-    decrement.addEventListener('click', () => {
-        const newIndex = (currentIndex - 1 + blocks.length) % blocks.length;
-        updateActive(newIndex);
-        start();
-    });
-	start();
-});
 </script>
 
 <main>
 	<div class="flex items-center justify-center mt-40 mb-10 gap-4">
-		<button id="decrement" class="bg-gray-400 text-white h-10 px-4 rounded hover:opacity-70 z-10">-</button>
-		<div class="flex justify-between w-full gap-4 relative overflow-hidden">
-			{#each slides as slide, i}
-				<div class="slide {i === currentIndex ? 'active' : ''}">{slide}</div>
-			{/each}
-		</div>
-		<button id="increment" class="bg-gray-400 text-white h-10 px-4 rounded hover:opacity-70 z-10">+</button>
+		<SlideButton on:click={decrement} content="-"/>
+		<Slide slides={slides} active={active} bind:blocks bind:contentDiv />
+		<SlideButton on:click={increment} content="+"/>
 	</div>
-	<div class="flex justify-center mt-5 gap-2">
-		{#each slides as _, i}
-			<p class="w-3 h-3 rounded-full bg-gray-300 transition-colors dot"></p>
-		{/each}
-	</div>
+	<Dot dots={slides} active={active}/> 
 </main>
