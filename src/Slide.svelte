@@ -1,7 +1,7 @@
 <script>
     import { fade } from 'svelte/transition';
 
-    export let slides = [];
+    export let slides;
     export let active;
     let blocks = [];              // Массив с DOM slide
     let contentDiv;               // Наш контейнер
@@ -20,14 +20,15 @@
     }
 </script>
 
+<!-- НАЙДЕН БАГ, ПОЧЕМУ ТО СЛАЙДЫ ПРИ СКРОЛЕ СМЕЩАЮТСЯ ВНИЗ ЦЕНТРИРУЯСЬ ПО ВЕРТИКАЛИ -->
+
 <main class="flex justify-between gap-4 relative overflow-hidden" bind:this={contentDiv}>
   {#each slides as slide, i}
     <div
-      transition:fade={{ delay: i * 200, duration: 2000 }}
       bind:this={blocks[i]}
       class="slide {i === active ? 'active' : ''}"
     >
-      {slide}
+      {slide.title}
     </div>
   {/each}
 </main>

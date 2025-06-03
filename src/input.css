@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 .slide {
-    @apply bg-red-700 rounded-[20px] h-[200px] w-[40vw] opacity-70 transition-transform duration-500;
+    @apply bg-red-700 rounded-[20px] h-[200px] w-[40vw] opacity-70 transition-transform duration-500 text-white p-5;
 }
 
 .slide:not(.active) {
